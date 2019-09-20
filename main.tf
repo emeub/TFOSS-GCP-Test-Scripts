@@ -1,28 +1,32 @@
 provider "google" {
-  project = "{TFOSS-GCP}"
+  project = "tfoss-gcp"
   region  = "us-central1"
   zone    = "us-central1-c"
 }
 
 resource "google_compute_instance" "vm_instance" {
-  name         = "ubuntu1804"
-  machine_type = "f1-micro"
+  count        = "30" // number of vm instances being set
+  name         = "ubuntu${count.index+1}"
+  machine_type = "g1-small" // 0.5 vCPUs 1.7 GB RAM
 
   boot_disk {
     initialize_params {
-      image = "ubuntu-os-cloud/ubuntu-1804-lts"
+      image = "ubuntu-os-cloud/ubuntu-1804-lts" // ubuntu 18.04 LTS
     }
   }
 
   network_interface {
     # A default network is created for all GCP projects
-    network       = "${google_compute_network.vpc_network.self_link}"
+    network       = "${google_compute_network.vpc_network.self_link}" // does magic
+    subnetwork = "network01"
+    address    = "10.1.0.${count.index+2}"
+
     access_config {
-    }
+      }
   }
 }
 
 resource "google_compute_network" "vpc_network" {
-  name                    = "terraform-network"
-  auto_create_subnetworks = "true"
+  name                    = "terraform-network" // terraform defaults (?) 
+  auto_create_subnetworks = "true" // terraform defaults (?)
 }
