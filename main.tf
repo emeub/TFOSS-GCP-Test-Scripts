@@ -8,6 +8,7 @@ resource "google_compute_instance" "vm_instance" {
   count        = "30" // number of vm instances being set
   name         = "ubuntu${count.index+1}"
   machine_type = "g1-small" // 0.5 vCPUs 1.7 GB RAM
+  allow_stopping_for_update = true // resize the VM after initial creation
 
   boot_disk {
     initialize_params {
